@@ -3,15 +3,22 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "${DIR}"
 
-set +x # Disable debugging
-set -u # Stop on uninitialised variable
 set -e # Stop on first non-null return value
 
+settings="$1"
+
+if [[ -z "$settings" ]]; then
+    settings=~/.m2/ossrh.xml
+fi
+
+set -u # Stop on uninitialised variable
+mvn="mvn -s $settings"
+
 echo " * Perform unit tests..."
-mvn test
+$mvn test
 
 echo " * Prepare the release"
-mvn --batch-mode release:prepare -Darguments="-DskipTests"
+$mvn --batch-mode release:prepare -Darguments="-DskipTests"
 
 echo " * Prepare the release"
-mvn release:perform -Darguments="-DskipTests"
+$mvn release:perform -Darguments="-DskipTests"
