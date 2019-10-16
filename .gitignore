@@ -2,3 +2,4 @@
 .idea
 target
 *.iml
+*_processed.pdf
