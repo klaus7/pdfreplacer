@@ -14,6 +14,9 @@ import java.util.function.Function;
 @Accessors(chain = true)
 public class PDFTextSearchLocation {
 
+    /** The match mode to use for this location. */
+    MatchMode matchMode = MatchMode.TRIM_EQUALS;
+
     /** Search text. */
     String searchText;
 
@@ -44,4 +47,27 @@ public class PDFTextSearchLocation {
         this.replaceText = replaceText;
     }
 
+    public PDFTextSearchLocation(MatchMode matchMode, String searchText, String replaceText) {
+        this.matchMode = matchMode;
+        this.searchText = searchText;
+        this.replaceText = replaceText;
+    }
+
+    public PDFTextSearchLocation(MatchMode matchMode, String searchText, Function<String, String> replacementTextTransformer) {
+        this.matchMode = matchMode;
+        this.searchText = searchText;
+        this.replacementTextTransformer = replacementTextTransformer;
+    }
+
+    public void find(String text, int currentPageNo, List<UnicodeEntry> unicodeEntries) {
+        if (matchMode.matches(getSearchText(), text)) {
+            setFound(true);
+            foundCount++;
+            getResults().add(new PDFTextSearchResult(
+                    currentPageNo,
+                    unicodeEntries.get(0).textRenderingMatrix
+            ));
+        }
+
+    }
 }

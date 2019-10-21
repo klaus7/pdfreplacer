@@ -138,15 +138,8 @@ public class PDFTextReplacer extends PDFTextStripper {
         String text = sb.toString();
         boolean found = false;
         for (PDFTextSearchLocation location : locations) {
-            if (text.contains(location.getSearchText())) {
-                found = true;
-                location.setFound(true);
-                location.foundCount++;
-                location.getResults().add(new PDFTextSearchResult(
-                        getCurrentPageNo(),
-                        unicodeEntries.get(0).textRenderingMatrix
-                ));
-            }
+            location.find(text, getCurrentPageNo(), unicodeEntries);
+            found |= location.found;
         }
 
         if (removeFoundTextElements && found) {
