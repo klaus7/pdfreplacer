@@ -20,5 +20,5 @@ $mvn test
 echo " * Prepare the release"
 $mvn --batch-mode release:prepare -Darguments="-DskipTests"
 
-echo " * Prepare the release"
+echo " * Perform the release"
 $mvn release:perform -Darguments="-DskipTests"
