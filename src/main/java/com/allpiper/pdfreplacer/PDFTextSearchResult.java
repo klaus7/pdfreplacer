@@ -11,5 +11,5 @@ class PDFTextSearchResult {
     /** A 1 based number representing the current page. */
     int page;
     Matrix textMatrix;
-
+    String text;
 }

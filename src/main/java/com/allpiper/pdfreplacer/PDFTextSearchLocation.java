@@ -27,7 +27,7 @@ public class PDFTextSearchLocation {
     PDFont font = PDType1Font.HELVETICA_BOLD;
 
     /** Custom replacement transformations. */
-    Function<String, String> replacementTextTransformer = s -> s;
+    Function<String, String> replacementTextTransformer = null;
 
     /** Custom content stream transformations. (e.g. font color) */
     ContentStreamTransformer contentStreamTransformer = cs -> {};
@@ -59,13 +59,14 @@ public class PDFTextSearchLocation {
         this.replacementTextTransformer = replacementTextTransformer;
     }
 
-    public void find(String text, int currentPageNo, List<UnicodeEntry> unicodeEntries) {
+    public void findInText(String text, int currentPageNo, List<UnicodeEntry> unicodeEntries) {
         if (matchMode.matches(getSearchText(), text)) {
             setFound(true);
             foundCount++;
             getResults().add(new PDFTextSearchResult(
                     currentPageNo,
-                    unicodeEntries.get(0).textRenderingMatrix
+                    unicodeEntries.get(0).textRenderingMatrix,
+                    text
             ));
         }
 

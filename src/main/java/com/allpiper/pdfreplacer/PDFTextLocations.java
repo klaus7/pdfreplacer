@@ -7,7 +7,7 @@ public class PDFTextLocations extends ArrayList<PDFTextSearchLocation> {
 
     public boolean textFoundIn(String text) {
         for (PDFTextSearchLocation location : this) {
-            if (text.contains(location.getSearchText())) {
+            if (location.matchMode.matches(location.searchText, text)) {
                 return true;
             }
         }

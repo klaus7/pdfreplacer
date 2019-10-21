@@ -92,7 +92,11 @@ public class PDFTextReplacer extends PDFTextStripper {
                 location.contentStreamTransformer.transform(cs);
                 cs.beginText();
                 cs.setTextMatrix(result.textMatrix);
-                cs.showText(location.replaceText);
+                if (location.replacementTextTransformer != null) {
+                    cs.showText(location.replacementTextTransformer.apply(result.text));
+                } else {
+                    cs.showText(location.replaceText);
+                }
                 cs.endText();
 
                 cs.close();
@@ -138,7 +142,7 @@ public class PDFTextReplacer extends PDFTextStripper {
         String text = sb.toString();
         boolean found = false;
         for (PDFTextSearchLocation location : locations) {
-            location.find(text, getCurrentPageNo(), unicodeEntries);
+            location.findInText(text, getCurrentPageNo(), unicodeEntries);
             found |= location.found;
         }
 
