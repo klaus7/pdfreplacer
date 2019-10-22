@@ -8,13 +8,18 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.junit.jupiter.api.Test;
 
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /** @author Klaus Pfeiffer - klaus@allpiper.com */
 public class CompareTest {
+
+    static boolean writeOutImageOnFail = false;
 
     @Test
     public void checkCorrectEmptyReplacement() throws Exception {
@@ -39,14 +44,10 @@ public class CompareTest {
             document.close();
 
             // compare
-            BufferedImage empty = new PDFRenderer(PDDocument.load(getClass().getResourceAsStream("/test_empty.pdf"))).renderImageWithDPI(0, 300);
+            BufferedImage empty = new PDFRenderer(PDDocument.load(getClass().getResourceAsStream("/test_empty_field3.pdf"))).renderImageWithDPI(0, 300);
             BufferedImage processed = new PDFRenderer(PDDocument.load(outputBytes)).renderImageWithDPI(0, 300);
 
-            ImageComparator imageComparator = new ImageComparator(empty, processed);
-            ImageComparator.Result difference = imageComparator.getDifference(false);
-            System.out.println(difference);
-
-            assertThat(difference.getPixelDifferenceCount()).isEqualTo(0);
+            assertNoPixelDifference(empty, processed);
         }
     }
 
@@ -75,11 +76,7 @@ public class CompareTest {
             BufferedImage empty = new PDFRenderer(PDDocument.load(getClass().getResourceAsStream("/test_empty.pdf"))).renderImageWithDPI(0, 300);
             BufferedImage processed = new PDFRenderer(PDDocument.load(outputBytes)).renderImageWithDPI(0, 300);
 
-            ImageComparator imageComparator = new ImageComparator(empty, processed);
-            ImageComparator.Result difference = imageComparator.getDifference(false);
-            System.out.println(difference);
-
-            assertThat(difference.getPixelDifferenceCount()).isEqualTo(0);
+            assertNoPixelDifference(empty, processed);
         }
     }
 
@@ -108,12 +105,26 @@ public class CompareTest {
             BufferedImage empty = new PDFRenderer(PDDocument.load(getClass().getResourceAsStream("/test_empty.pdf"))).renderImageWithDPI(0, 300);
             BufferedImage processed = new PDFRenderer(PDDocument.load(outputBytes)).renderImageWithDPI(0, 300);
 
-            ImageComparator imageComparator = new ImageComparator(empty, processed);
-            ImageComparator.Result difference = imageComparator.getDifference(false);
-            System.out.println(difference);
-
-            assertThat(difference.getPixelDifferenceCount()).isEqualTo(0);
+            assertNoPixelDifference(empty, processed);
         }
+    }
+
+    private void assertNoPixelDifference(BufferedImage empty, BufferedImage processed) {
+        ImageComparator imageComparator = new ImageComparator(empty, processed);
+        ImageComparator.Result difference = imageComparator.getDifference(false);
+        System.out.println(difference);
+
+        long pixelDifferenceCount = difference.getPixelDifferenceCount();
+        if (writeOutImageOnFail && pixelDifferenceCount > 0L) {
+            try {
+                File pdfreplacerFile = File.createTempFile("pdfreplacer", ".png");
+                ImageIO.write(processed, "PNG", pdfreplacerFile);
+                System.out.println("PNG written: " + pdfreplacerFile);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        assertThat(pixelDifferenceCount).isEqualTo(0);
     }
 
 

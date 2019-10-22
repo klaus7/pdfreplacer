@@ -18,7 +18,8 @@ echo " * Perform unit tests..."
 $mvn test
 
 echo " * Prepare the release"
-$mvn --batch-mode release:prepare -Darguments="-DskipTests"
+#$mvn --batch-mode release:prepare -Darguments="-DskipTests"
+$mvn release:prepare -Darguments="-DskipTests"
 
 echo " * Perform the release"
 $mvn release:perform -Darguments="-DskipTests"

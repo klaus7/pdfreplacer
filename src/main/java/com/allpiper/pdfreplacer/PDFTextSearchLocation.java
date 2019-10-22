@@ -59,7 +59,7 @@ public class PDFTextSearchLocation {
         this.replacementTextTransformer = replacementTextTransformer;
     }
 
-    public void findInText(String text, int currentPageNo, List<UnicodeEntry> unicodeEntries) {
+    public boolean findInText(String text, int currentPageNo, List<UnicodeEntry> unicodeEntries) {
         if (matchMode.matches(getSearchText(), text)) {
             setFound(true);
             foundCount++;
@@ -68,7 +68,9 @@ public class PDFTextSearchLocation {
                     unicodeEntries.get(0).textRenderingMatrix,
                     text
             ));
+            return true;
         }
+        return false;
 
     }
 }
