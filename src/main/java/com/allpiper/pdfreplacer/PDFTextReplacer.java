@@ -85,6 +85,16 @@ public class PDFTextReplacer extends PDFTextStripper {
             }
             List<PDFTextSearchResult> results = location.getResults();
             for (PDFTextSearchResult result : results) {
+                String showText;
+                if (location.replacementTextTransformer != null) {
+                    showText = location.replacementTextTransformer.apply(result.text);
+                } else {
+                    showText = location.replaceText;
+                }
+                if (showText == null || "".equals(showText)) {
+                    continue;
+                }
+
                 PDPage page = document.getPage(result.getPage() - 1);
                 PDPageContentStream cs = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true, true);
 
@@ -92,11 +102,7 @@ public class PDFTextReplacer extends PDFTextStripper {
                 location.contentStreamTransformer.transform(cs);
                 cs.beginText();
                 cs.setTextMatrix(result.textMatrix);
-                if (location.replacementTextTransformer != null) {
-                    cs.showText(location.replacementTextTransformer.apply(result.text));
-                } else {
-                    cs.showText(location.replaceText);
-                }
+                cs.showText(showText);
                 cs.endText();
 
                 cs.close();

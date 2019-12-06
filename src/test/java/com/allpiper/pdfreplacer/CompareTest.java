@@ -109,6 +109,35 @@ public class CompareTest {
         }
     }
 
+    @Test
+    public void checkTransformerNullReplacement() throws Exception {
+        PDFTextLocations locations = new PDFTextLocations();
+        locations.add(new PDFTextSearchLocation(MatchMode.REGEX, "###.*", s -> null));
+
+        PDFParser parser = new PDFParser(new RandomAccessBuffer(getClass().getResourceAsStream("/test.pdf")));
+        parser.parse();
+
+        try (COSDocument cosDoc = parser.getDocument()) {
+            PDDocument document = new PDDocument(cosDoc);
+
+            PDFTextReplacer locator = new PDFTextReplacer(document, locations);
+
+            locator.searchAndReplace();
+
+            document.setAllSecurityToBeRemoved(true);
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+            document.save(output);
+            byte[] outputBytes = output.toByteArray();
+            document.close();
+
+            // compare
+            BufferedImage empty = new PDFRenderer(PDDocument.load(getClass().getResourceAsStream("/test_empty.pdf"))).renderImageWithDPI(0, 300);
+            BufferedImage processed = new PDFRenderer(PDDocument.load(outputBytes)).renderImageWithDPI(0, 300);
+
+            assertNoPixelDifference(empty, processed);
+        }
+    }
+
     private void assertNoPixelDifference(BufferedImage empty, BufferedImage processed) {
         ImageComparator imageComparator = new ImageComparator(empty, processed);
         ImageComparator.Result difference = imageComparator.getDifference(false);
