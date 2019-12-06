@@ -8,7 +8,7 @@
 
     <groupId>com.allpiper</groupId>
     <artifactId>pdfreplacer</artifactId>
-    <version>0.1.3-SNAPSHOT</version>
+    <version>0.1.3</version>
 
     <properties>
         <junit.version>5.4.0</junit.version>
@@ -32,7 +32,7 @@
         <url>https://github.com/klaus7/pdfreplacer</url>
         <connection>scm:git:git://github.com/klaus7/pdfreplacer.git</connection>
         <developerConnection>scm:git:git@github.com:klaus7/pdfreplacer.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>pdfreplacer-0.1.3</tag>
     </scm>
 
     <distributionManagement>
