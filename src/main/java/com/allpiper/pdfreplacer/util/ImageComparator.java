@@ -22,7 +22,13 @@ public class ImageComparator {
         // convert images to pixel arrays
         final int w = img1.getWidth();
         final int h = img1.getHeight();
+        if (w != img2.getWidth() || h != img2.getHeight()) {
+            System.out.printf("w1: %d, h1: %d, w2: %d, h2: %d %n", w, h, img2.getWidth(), img2.getHeight());
+            result.differentDimensions = true;
+            return result;
+        }
         result.totalPixelCount = w * h;
+
         final int[] p1 = img1.getRGB(0, 0, w, h, null, 0, w);
         final int[] p2 = img2.getRGB(0, 0, w, h, null, 0, w);
         // compare pixel by pixel. If different, highlight img1's pixel.
@@ -48,7 +54,12 @@ public class ImageComparator {
         long totalPixelCount = 0;
         long pixelDifferenceCount = 0;
         float pixelDifferenceRelation = 0;
+        boolean differentDimensions = false;
 
         BufferedImage out;
+
+        public boolean isDifferent() {
+            return pixelDifferenceCount > 0 || differentDimensions;
+        }
     }
 }

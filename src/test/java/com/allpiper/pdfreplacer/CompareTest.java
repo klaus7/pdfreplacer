@@ -52,6 +52,40 @@ public class CompareTest {
     }
 
     @Test
+    public void checkCorrectEmptyReplacement_Append2() throws Exception {
+        PDFTextLocations locations = new PDFTextLocations();
+        locations.add(new PDFTextSearchLocation("###FIELD1###", "."));
+
+        PDFParser parser = new PDFParser(new RandomAccessBuffer(getClass().getResourceAsStream("/test.pdf")));
+        parser.parse();
+
+        try (COSDocument cosDoc = parser.getDocument()) {
+            PDDocument document = new PDDocument(cosDoc);
+
+            PDFTextReplacer locator = new PDFTextReplacer(document, locations);
+
+            PDFParser appendableDocumentParser = new PDFParser(new RandomAccessBuffer(getClass().getResourceAsStream("/test_empty.pdf")));
+            appendableDocumentParser.parse();
+            try (COSDocument appendableDocumentCosDoc = appendableDocumentParser.getDocument()) {
+                PDDocument appendableDocument = new PDDocument(appendableDocumentCosDoc);
+                locator.searchAndAddToDifferentDocument(appendableDocument);
+
+                appendableDocument.setAllSecurityToBeRemoved(true);
+                ByteArrayOutputStream output = new ByteArrayOutputStream();
+                appendableDocument.save(output);
+                byte[] outputBytes = output.toByteArray();
+                appendableDocument.close();
+
+                // compare
+                BufferedImage empty = new PDFRenderer(PDDocument.load(getClass().getResourceAsStream("/test_empty.pdf"))).renderImageWithDPI(0, 300);
+                BufferedImage processed = new PDFRenderer(PDDocument.load(outputBytes)).renderImageWithDPI(0, 300);
+
+                assertPixelDifference(empty, processed, 72L);
+            }
+        }
+    }
+
+    @Test
     public void checkRegexEmptyReplacement() throws Exception {
         PDFTextLocations locations = new PDFTextLocations();
         locations.add(new PDFTextSearchLocation(MatchMode.REGEX, "###.*", ""));
@@ -139,12 +173,16 @@ public class CompareTest {
     }
 
     private void assertNoPixelDifference(BufferedImage empty, BufferedImage processed) {
+        assertPixelDifference(empty, processed, 0L);
+    }
+
+    private void assertPixelDifference(BufferedImage empty, BufferedImage processed, long pixelDiff) {
         ImageComparator imageComparator = new ImageComparator(empty, processed);
         ImageComparator.Result difference = imageComparator.getDifference(false);
         System.out.println(difference);
 
         long pixelDifferenceCount = difference.getPixelDifferenceCount();
-        if (writeOutImageOnFail && pixelDifferenceCount > 0L) {
+        if (writeOutImageOnFail && pixelDifferenceCount != pixelDiff) {
             try {
                 File pdfreplacerFile = File.createTempFile("pdfreplacer", ".png");
                 ImageIO.write(processed, "PNG", pdfreplacerFile);
@@ -153,7 +191,10 @@ public class CompareTest {
                 e.printStackTrace();
             }
         }
-        assertThat(pixelDifferenceCount).isEqualTo(0);
+        assertThat(pixelDifferenceCount).isEqualTo(pixelDiff);
+        if (pixelDiff <= 0L) {
+            assertThat(difference.isDifferent()).isFalse();
+        }
     }
 
 

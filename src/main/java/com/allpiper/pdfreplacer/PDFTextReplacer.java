@@ -2,7 +2,6 @@ package com.allpiper.pdfreplacer;
 
 import org.apache.pdfbox.contentstream.operator.Operator;
 import org.apache.pdfbox.cos.COSBase;
-import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdfwriter.ContentStreamWriter;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -53,10 +52,17 @@ public class PDFTextReplacer extends PDFTextStripper {
         removeFoundTextElements = true;
         search();
         writeTokensWithoutFoundTextElements();
-        addChangedText();
+        addChangedText(document);
         if (removeUnprocessedPages) {
             removeUnprocessedPages();
         }
+    }
+
+    /** Used when modifying text elements is not wanted or there are faulty results.
+     * @param appendableDocument The document where the text is added (without the marker) */
+    public void searchAndAddToDifferentDocument(PDDocument appendableDocument) throws IOException {
+        search();
+        addChangedText(appendableDocument);
     }
 
     public void search() throws IOException {
@@ -67,7 +73,7 @@ public class PDFTextReplacer extends PDFTextStripper {
         int numberOfPages = Math.min(getEndPage(), document.getNumberOfPages());
         for (int numPage = 0; numPage < numberOfPages; numPage++) {
             PDStream updatedStream = new PDStream(document);
-            OutputStream out = updatedStream.createOutputStream(COSName.FLATE_DECODE);
+            OutputStream out = createOutputStream(updatedStream);
             ContentStreamWriter tokenWriter = new ContentStreamWriter(out);
             tokenWriter.writeTokens(tokensPerPage.get(numPage));
             out.close();
@@ -77,7 +83,11 @@ public class PDFTextReplacer extends PDFTextStripper {
         }
     }
 
-    public void addChangedText() throws IOException {
+    protected OutputStream createOutputStream(PDStream updatedStream) throws IOException {
+        return updatedStream.createOutputStream(); // COSName.FLATE_DECODE
+    }
+
+    public void addChangedText(PDDocument document) throws IOException {
         int fontSize = 1;
         for (PDFTextSearchLocation location : locations) {
             if (!location.isFound()) {
@@ -128,6 +138,21 @@ public class PDFTextReplacer extends PDFTextStripper {
         tokens.addAll(operands);
         tokens.add(operator);
         super.processOperator(operator, operands);
+    }
+
+    @Override
+    protected void writePage() throws IOException {
+        super.writePage();
+    }
+
+    @Override
+    protected void operatorException(Operator operator, List<COSBase> operands, IOException e) throws IOException {
+        super.operatorException(operator, operands, e);
+    }
+
+    @Override
+    protected void unsupportedOperator(Operator operator, List<COSBase> operands) throws IOException {
+        super.unsupportedOperator(operator, operands);
     }
 
     @Override
