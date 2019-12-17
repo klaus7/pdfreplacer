@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /** @author Klaus Pfeiffer - klaus@allpiper.com */
 public class CompareTest {
 
-    static boolean writeOutImageOnFail = false;
+    static boolean writeOutImageOnFail = true;
 
     @Test
     public void checkCorrectEmptyReplacement() throws Exception {
@@ -82,7 +82,59 @@ public class CompareTest {
 
                 assertPixelDifference(empty, processed, 72L);
             }
+            document.close();
         }
+    }
+
+    @Test
+    public void checkCorrectEmptyReplacementAppendTwoPages() throws Exception {
+        PDFTextLocations locations = new PDFTextLocations();
+        locations.add(new PDFTextSearchLocation("###FIELD1###", "."));
+
+        PDFTextReplacer locator;
+
+        PDFParser parser = new PDFParser(new RandomAccessBuffer(getClass().getResourceAsStream("/test2.pdf")));
+        parser.parse();
+        try (COSDocument cosDoc = parser.getDocument()) {
+            PDDocument document = new PDDocument(cosDoc);
+
+            locator = new PDFTextReplacer(document, locations);
+
+            locator.search();
+            document.close();
+        }
+
+        PDFParser appendableDocumentParser = new PDFParser(new RandomAccessBuffer(getClass().getResourceAsStream("/test2_empty.pdf")));
+        appendableDocumentParser.parse();
+        try (COSDocument appendableDocumentCosDoc = appendableDocumentParser.getDocument()) {
+            PDDocument appendableDocument = new PDDocument(appendableDocumentCosDoc);
+
+            locator.addChangedText(appendableDocument);
+
+            appendableDocument.setAllSecurityToBeRemoved(true);
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+            appendableDocument.save(output);
+            byte[] outputBytes = output.toByteArray();
+            appendableDocument.close();
+
+            // compare
+            PDDocument emptyDoc = PDDocument.load(getClass().getResourceAsStream("/test2_empty.pdf"));
+            PDDocument processedDoc = PDDocument.load(outputBytes);
+
+            {
+                int page = 0;
+                BufferedImage empty = new PDFRenderer(emptyDoc).renderImageWithDPI(page, 300);
+                BufferedImage processed = new PDFRenderer(processedDoc).renderImageWithDPI(page, 300);
+                assertPixelDifference(empty, processed, 0L);
+            }
+            {
+                int page = 1;
+                BufferedImage empty = new PDFRenderer(emptyDoc).renderImageWithDPI(page, 300);
+                BufferedImage processed = new PDFRenderer(processedDoc).renderImageWithDPI(page, 300);
+                assertPixelDifference(empty, processed, 72L);
+            }
+        }
+
     }
 
     @Test
