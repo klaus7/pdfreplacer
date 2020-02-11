@@ -1,5 +1,6 @@
 package com.allpiper.pdfreplacer;
 
+import lombok.Setter;
 import org.apache.pdfbox.contentstream.operator.Operator;
 import org.apache.pdfbox.cos.COSBase;
 import org.apache.pdfbox.pdfwriter.ContentStreamWriter;
@@ -40,6 +41,9 @@ public class PDFTextReplacer extends PDFTextStripper {
     /** If found text elements should be completely removed. */
     private boolean removeFoundTextElements = false;
     private boolean removeUnprocessedPages = false;
+
+    @Setter
+    private float multilineMatrixTranslationY = -1f;
 
     public PDFTextReplacer(PDDocument document, PDFTextLocations locations) throws IOException {
         super.setSortByPosition(true);
@@ -110,10 +114,27 @@ public class PDFTextReplacer extends PDFTextStripper {
 
                 cs.setFont(location.font, fontSize);
                 location.contentStreamTransformer.transform(cs);
-                cs.beginText();
-                cs.setTextMatrix(result.textMatrix);
-                cs.showText(showText);
-                cs.endText();
+                Matrix textMatrix = result.textMatrix;
+                if (showText.contains("\n")) {
+
+                    // Multiline processing
+                    textMatrix = textMatrix.clone();
+
+                    String[] lines = showText.split("\n");
+                    for (String line : lines) {
+                        cs.beginText();
+                        cs.setTextMatrix(textMatrix);
+                        cs.showText(line);
+                        cs.endText();
+                        textMatrix.translate(0f, multilineMatrixTranslationY);
+                    }
+
+                } else {
+                    cs.beginText();
+                    cs.setTextMatrix(textMatrix);
+                    cs.showText(showText);
+                    cs.endText();
+                }
 
                 cs.close();
             }

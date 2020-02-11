@@ -22,6 +22,7 @@ class PDFTextReplacerTest {
 
         addTest("FIELD1");
         addTest("FIELD2");
+        locations.add(new PDFTextSearchLocation("###FIELD3###", "Test Line 1\nTest Line 2\nTest Line 3"));
 
         int endPage = 6;
 
