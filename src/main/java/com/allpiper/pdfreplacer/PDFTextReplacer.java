@@ -100,6 +100,9 @@ public class PDFTextReplacer extends PDFTextStripper {
             }
             List<PDFTextSearchResult> results = location.getResults();
             for (PDFTextSearchResult result : results) {
+                if (location.locationTransformer != null) {
+                    location = location.locationTransformer.transform(location, result);
+                }
                 String showText;
                 if (location.replacementTextTransformer != null) {
                     showText = location.replacementTextTransformer.apply(result.text);

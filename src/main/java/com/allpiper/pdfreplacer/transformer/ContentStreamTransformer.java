@@ -1,4 +1,4 @@
-package com.allpiper.pdfreplacer;
+package com.allpiper.pdfreplacer.transformer;
 
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 

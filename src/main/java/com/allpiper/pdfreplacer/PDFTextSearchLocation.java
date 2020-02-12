@@ -1,5 +1,7 @@
 package com.allpiper.pdfreplacer;
 
+import com.allpiper.pdfreplacer.transformer.ContentStreamTransformer;
+import com.allpiper.pdfreplacer.transformer.PDFTextSearchLocationTransformer;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.apache.pdfbox.pdmodel.font.PDFont;
@@ -28,6 +30,9 @@ public class PDFTextSearchLocation {
 
     /** Custom replacement transformations. */
     Function<String, String> replacementTextTransformer = null;
+
+    /** Custom replacement transformations. E.g. change maxWidth according to search result. */
+    PDFTextSearchLocationTransformer locationTransformer = null;
 
     /** Custom content stream transformations. (e.g. font color) */
     ContentStreamTransformer contentStreamTransformer = cs -> {};
