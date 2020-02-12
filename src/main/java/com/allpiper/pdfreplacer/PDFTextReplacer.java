@@ -16,13 +16,14 @@ import org.apache.pdfbox.util.Vector;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /** @author Klaus Pfeiffer - klaus@allpiper.com */
 public class PDFTextReplacer extends PDFTextStripper {
+
+    private static final Pattern tokenPattern = Pattern.compile("\\S+\\s+");
 
     /** Search locations. */
     private final PDFTextLocations locations;
@@ -112,33 +113,59 @@ public class PDFTextReplacer extends PDFTextStripper {
                 PDPage page = document.getPage(result.getPage() - 1);
                 PDPageContentStream cs = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true, true);
 
-                cs.setFont(location.font, fontSize);
+                PDFont font = location.font;
+                cs.setFont(font, fontSize);
                 location.contentStreamTransformer.transform(cs);
-                Matrix textMatrix = result.textMatrix;
-                if (showText.contains("\n")) {
 
-                    // Multiline processing
-                    textMatrix = textMatrix.clone();
+                // Make copy of matrix so we can change the instance without side effects
+                Matrix textMatrix = result.textMatrix.clone();
 
-                    String[] lines = showText.split("\n");
-                    for (String line : lines) {
-                        cs.beginText();
-                        cs.setTextMatrix(textMatrix);
-                        cs.showText(line);
-                        cs.endText();
-                        textMatrix.translate(0f, multilineMatrixTranslationY);
-                    }
+                // Split at line breaks
+                String[] lines = showText.split("\n");
 
-                } else {
-                    cs.beginText();
-                    cs.setTextMatrix(textMatrix);
-                    cs.showText(showText);
-                    cs.endText();
-                }
+                processLines(location, cs, font, textMatrix, lines);
 
                 cs.close();
             }
         }
+    }
+
+    private void processLines(PDFTextSearchLocation location, PDPageContentStream cs, PDFont font, Matrix textMatrix, String[] lines) throws IOException {
+        Deque<String> lineStack = new ArrayDeque<>(Arrays.asList(lines));
+
+        while (!lineStack.isEmpty()) {
+            String line = lineStack.pop();
+            if (location.maxWidth > 0f) {
+                // Has max width
+                if (font.getStringWidth(line) > location.maxWidth) {
+                    // Detect where to wrap
+                    Matcher matcher = tokenPattern.matcher(line);
+                    int lastEnd = 0;
+                    while (matcher.find()) {
+                        int end = matcher.end();
+                        if (font.getStringWidth(line.substring(0, end)) > location.maxWidth) {
+                            // Line already too long, break at last end
+                            if (lastEnd > 0) {
+                                lineStack.add(line.substring(lastEnd));
+                                line = line.substring(0, lastEnd);
+                            }
+                            break;
+                        }
+                        lastEnd = end;
+                    }
+                }
+            }
+
+            showText(cs, textMatrix, line);
+            textMatrix.translate(0f, multilineMatrixTranslationY);
+        }
+    }
+
+    private void showText(PDPageContentStream cs, Matrix textMatrix, String line) throws IOException {
+        cs.beginText();
+        cs.setTextMatrix(textMatrix);
+        cs.showText(line);
+        cs.endText();
     }
 
     public void removeUnprocessedPages() {

@@ -32,6 +32,13 @@ public class PDFTextSearchLocation {
     /** Custom content stream transformations. (e.g. font color) */
     ContentStreamTransformer contentStreamTransformer = cs -> {};
 
+    /** Wrap at width. 0f for no wrapping. Width is determined by
+     * {@link org.apache.pdfbox.pdmodel.font.PDFont#getStringWidth(java.lang.String)}
+     * <p>Quote: The width of the string in 1/1000 units of text space.</p>
+     * <p>Also according to the documentation the average font with: "The width is in 1000 unit of text space, ie 333 or 777"</p>
+     * <p>E.g. ~50000 could be a good value to break lines at whole page width.</p>*/
+    float maxWidth = 0f;
+
     boolean found;
     int foundCount;
 
@@ -45,6 +52,12 @@ public class PDFTextSearchLocation {
     public PDFTextSearchLocation(String searchText, String replaceText) {
         this.searchText = searchText;
         this.replaceText = replaceText;
+    }
+
+    public PDFTextSearchLocation(String searchText, String replaceText, float maxWidth) {
+        this.searchText = searchText;
+        this.replaceText = replaceText;
+        this.maxWidth = maxWidth;
     }
 
     public PDFTextSearchLocation(MatchMode matchMode, String searchText, String replaceText) {

@@ -22,7 +22,11 @@ class PDFTextReplacerTest {
 
         addTest("FIELD1");
         addTest("FIELD2");
-        locations.add(new PDFTextSearchLocation("###FIELD3###", "Test Line 1\nTest Line 2\nTest Line 3"));
+        //locations.add(new PDFTextSearchLocation("###FIELD3###", "Test Line 1\nTest Line 2\nTest Line 3"));
+        locations.add(new PDFTextSearchLocation(
+                "###FIELD3###",
+                "Very long test line that should be wrapped by bounds. Very long test line that should be wrapped by bounds. Very long test line that should be wrapped by bounds. ",
+                15000f));
 
         int endPage = 6;
 
