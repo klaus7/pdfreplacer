@@ -28,6 +28,9 @@ public class PDFTextSearchLocation {
     /** Replacement font. */
     PDFont font = PDType1Font.HELVETICA_BOLD;
 
+    /** Replacement font size relative to found text matrix in the marker. */
+    float fontSize = 1f;
+
     /** Custom replacement transformations. */
     Function<String, String> replacementTextTransformer = null;
 
@@ -44,7 +47,10 @@ public class PDFTextSearchLocation {
      * <p>E.g. ~50000 could be a good value to break lines at whole page width.</p>*/
     float maxWidth = 0f;
 
+    /** True, if this location was found. */
     boolean found;
+
+    /** Count of found markers for this location. */
     int foundCount;
 
     /** Search results. */

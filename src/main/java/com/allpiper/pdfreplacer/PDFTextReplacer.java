@@ -93,7 +93,6 @@ public class PDFTextReplacer extends PDFTextStripper {
     }
 
     public void addChangedText(PDDocument document) throws IOException {
-        int fontSize = 1;
         for (PDFTextSearchLocation location : locations) {
             if (!location.isFound()) {
                 continue;
@@ -117,7 +116,7 @@ public class PDFTextReplacer extends PDFTextStripper {
                 PDPageContentStream cs = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true, true);
 
                 PDFont font = location.font;
-                cs.setFont(font, fontSize);
+                cs.setFont(font, location.fontSize);
                 location.contentStreamTransformer.transform(cs);
 
                 // Make copy of matrix so we can change the instance without side effects
