@@ -7,6 +7,7 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
@@ -26,7 +27,12 @@ class PDFTextReplacerTest {
                 "###FIELD3###",
                 "Very long test line that should break at a specified line width. Very long test line that should break at a specified line width. Very long test line that should break at a specified line width. ",
                 12500f));
-        addTest("FIELD4", "Red color replacement");
+        PDFTextSearchLocation redColorReplacement = new PDFTextSearchLocation(
+                "###FIELD4###",
+                "Red color replacement"
+        );
+        redColorReplacement.setContentStreamTransformer(cs -> cs.setNonStrokingColor(Color.red));
+        locations.add(redColorReplacement);
         addTest("FIELD5", "äöü@<>~*+áà");
 
         int endPage = 6;
