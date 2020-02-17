@@ -2,5 +2,5 @@
 .idea
 target
 *.iml
-*_processed.pdf
-*_processed.jpg
+src/**/*_processed.pdf
+src/**/*_processed.jpg
