@@ -54,6 +54,7 @@ class PDFTextReplacerTest {
             document.close();
         }
 
+        toJPG(doc + ".pdf", doc + ".jpg");
         toJPG(doc + "_processed.pdf", doc + "_processed.jpg");
     }
 
