@@ -17,20 +17,21 @@ class PDFTextReplacerTest {
 
     public static void main(String args[]) throws Exception {
 
-//        locations.add(new PDFTextSearchLocation("###NAME###", "Màx Müstermánn").setContentStreamTransformer(cs -> cs.setNonStrokingColor(Color.red)));
-//        locations.add(new PDFTextSearchLocation("###ADRESSE###"));
+//        locations.add(new PDFTextSearchLocation("###FIELD1###", "Màx Müstermánn").setContentStreamTransformer(cs -> cs.setNonStrokingColor(Color.red)));
 
-        addTest("FIELD1");
-        addTest("FIELD2");
+        addTest("FIELD1", "Test field replacement");
+        addTest("FIELD2", "Smaller font size replacement");
         //locations.add(new PDFTextSearchLocation("###FIELD3###", "Test Line 1\nTest Line 2\nTest Line 3"));
         locations.add(new PDFTextSearchLocation(
                 "###FIELD3###",
-                "Very long test line that should be wrapped by bounds. Very long test line that should be wrapped by bounds. Very long test line that should be wrapped by bounds. ",
-                15000f));
+                "Very long test line that should break at a specified line width. Very long test line that should break at a specified line width. Very long test line that should break at a specified line width. ",
+                12500f));
+        addTest("FIELD4", "Red color replacement");
+        addTest("FIELD5", "äöü@<>~*+áà");
 
         int endPage = 6;
 
-        String doc = "src/test/resources/" + "test";
+        String doc = "src/test/resources/" + "test_manual";
         File file = new File(doc + ".pdf");
         PDFParser parser = new PDFParser(new RandomAccessFile(file, "r"));
         parser.parse();
@@ -58,6 +59,10 @@ class PDFTextReplacerTest {
 
     private static void addTest(String s) {
         locations.add(new PDFTextSearchLocation("###" + s + "###", "Test " + s));
+    }
+
+    private static void addTest(String s, String result) {
+        locations.add(new PDFTextSearchLocation("###" + s + "###", result));
     }
 
     private static void addTestX(String s) {
