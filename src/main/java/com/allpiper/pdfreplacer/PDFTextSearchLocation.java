@@ -4,8 +4,6 @@ import com.allpiper.pdfreplacer.transformer.ContentStreamTransformer;
 import com.allpiper.pdfreplacer.transformer.PDFTextSearchLocationTransformer;
 import lombok.Data;
 import lombok.experimental.Accessors;
-import org.apache.pdfbox.pdmodel.font.PDFont;
-import org.apache.pdfbox.pdmodel.font.PDType1Font;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,8 +23,8 @@ public class PDFTextSearchLocation {
     /** Replacement text. */
     String replaceText = "";
 
-    /** Replacement font. */
-    PDFont font = PDType1Font.HELVETICA_BOLD;
+    /** Replacement font key. Default PDType1Font.HELVETICA_BOLD. Retrieved from {@link FontCache}*/
+    String font = null;
 
     /** Replacement font size relative to found text matrix in the marker. */
     float fontSize = 1f;

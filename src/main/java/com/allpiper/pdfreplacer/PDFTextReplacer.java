@@ -115,7 +115,7 @@ public class PDFTextReplacer extends PDFTextStripper {
                 PDPage page = document.getPage(result.getPage() - 1);
                 PDPageContentStream cs = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true, true);
 
-                PDFont font = location.font;
+                PDFont font = FontCache.get(location.font, document);
                 cs.setFont(font, location.fontSize);
                 location.contentStreamTransformer.transform(cs);
 

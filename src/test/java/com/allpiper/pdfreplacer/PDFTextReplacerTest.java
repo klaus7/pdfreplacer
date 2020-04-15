@@ -33,7 +33,7 @@ class PDFTextReplacerTest {
         );
         redColorReplacement.setContentStreamTransformer(cs -> cs.setNonStrokingColor(Color.red));
         locations.add(redColorReplacement);
-        addTest("FIELD5", "äöü@<>~*+áà");
+        addTest("FIELD5", "̈aÄÖÜ*'äöü@<>~*+áà");
 
         int endPage = 6;
 
@@ -69,7 +69,9 @@ class PDFTextReplacerTest {
     }
 
     private static void addTest(String s, String result) {
-        locations.add(new PDFTextSearchLocation("###" + s + "###", result));
+        PDFTextSearchLocation location = new PDFTextSearchLocation("###" + s + "###", result);
+        location.setFont("classpath:/Noto_Sans/NotoSans-Bold.ttf");
+        locations.add(location);
     }
 
     private static void addTestX(String s) {
