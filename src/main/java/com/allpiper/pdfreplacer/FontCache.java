@@ -17,10 +17,11 @@ public class FontCache {
     public static final String FILE = "file:";
     public static final String INTERNAL = "internal:";
 
-    private static final Map<String, PDFont> cacheMap = new HashMap<>();
     public static final PDType1Font DEFAULT_FONT = PDType1Font.HELVETICA_BOLD;
 
-    public static PDFont get(String key, PDDocument doc) throws IOException {
+    private final Map<String, PDFont> cacheMap = new HashMap<>();
+
+    public PDFont get(String key, PDDocument doc) throws IOException {
         if (key == null) {
             return DEFAULT_FONT;
         }
@@ -54,4 +55,7 @@ public class FontCache {
         return pdFont;
     }
 
+    public void clear() {
+        cacheMap.clear();
+    }
 }

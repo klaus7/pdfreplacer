@@ -46,6 +46,8 @@ public class PDFTextReplacer extends PDFTextStripper {
     @Setter
     private float multilineMatrixTranslationY = -1f;
 
+    private FontCache fontCache = new FontCache();
+
     public PDFTextReplacer(PDDocument document, PDFTextLocations locations) throws IOException {
         super.setSortByPosition(true);
         this.document = document;
@@ -93,6 +95,7 @@ public class PDFTextReplacer extends PDFTextStripper {
     }
 
     public void addChangedText(PDDocument document) throws IOException {
+        fontCache.clear();
         for (PDFTextSearchLocation location : locations) {
             if (!location.isFound()) {
                 continue;
@@ -115,7 +118,7 @@ public class PDFTextReplacer extends PDFTextStripper {
                 PDPage page = document.getPage(result.getPage() - 1);
                 PDPageContentStream cs = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true, true);
 
-                PDFont font = FontCache.get(location.font, document);
+                PDFont font = fontCache.get(location.font, document);
                 cs.setFont(font, location.fontSize);
                 location.contentStreamTransformer.transform(cs);
 
