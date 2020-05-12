@@ -188,7 +188,9 @@ public class PDFTextReplacer extends PDFTextStripper {
 
     @Override
     protected void processOperator(Operator operator, List<COSBase> operands) throws IOException {
-        tokens.addAll(operands);
+        if (operands != null) {
+            tokens.addAll(operands);
+        }
         tokens.add(operator);
         super.processOperator(operator, operands);
     }
