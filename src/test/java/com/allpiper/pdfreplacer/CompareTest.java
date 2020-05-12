@@ -80,7 +80,7 @@ public class CompareTest {
                 BufferedImage empty = new PDFRenderer(PDDocument.load(getClass().getResourceAsStream("/test_empty.pdf"))).renderImageWithDPI(0, 300);
                 BufferedImage processed = new PDFRenderer(PDDocument.load(outputBytes)).renderImageWithDPI(0, 300);
 
-                assertPixelDifference(empty, processed, 72L);
+                assertPixelDifference(empty, processed, 56L);
             }
             document.close();
         }
@@ -131,7 +131,7 @@ public class CompareTest {
                 int page = 1;
                 BufferedImage empty = new PDFRenderer(emptyDoc).renderImageWithDPI(page, 300);
                 BufferedImage processed = new PDFRenderer(processedDoc).renderImageWithDPI(page, 300);
-                assertPixelDifference(empty, processed, 72L);
+                assertPixelDifference(empty, processed, 56L);
             }
         }
 
